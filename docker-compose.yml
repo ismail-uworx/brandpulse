@@ -6,6 +6,9 @@ services:
     build: .
     container_name: brandpulse-backend
 
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+
     ports:
       - "8000:8000"
 

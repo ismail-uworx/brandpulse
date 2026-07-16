@@ -1,43 +1,22 @@
-from transformers import pipeline, AutoTokenizer
-from datasets import Dataset
-import pandas as pd
-import numpy as np
+from transformers import pipeline
 
-MODEL_NAME = "lxyuan/distilbert-base-multilingual-cased-sentiments-student"
+# model being used is lxyuan/distilbert-base-multilingual-cased-sentiments-student
 
-label2Id = {"negative": 0, "neutral": 1, "positive": 2}
+LOCAL_MODEL_PATH = "app/ai/fine_tuned_sentiment"
 
-
-def tokenize():
-
-    df = pd.read_excel("data\BrandPulse_Sentiment_Training_Dataset.xlsx")
-
-    df["label"] = df["label"].map(label2Id)
-    dataset = Dataset.from_dict(df)
-
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
-    def preprocessFunction(examples):
-        return tokenizer(examples["text"], truncation=True, max_length=28)
-
-    tokenizedDataset = dataset.map(preprocessFunction, batched=True)
-
-    return tokenizedDataset
-
-
-def fineTune():
-    print("Write fine tuning logic")
-
-
-pipeline = pipeline(
-    task="text-classification",
-    model="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
-    use_safetensors=True,
+sentimentPipeline = pipeline(
+    task="text-classification", model=LOCAL_MODEL_PATH, tokenizer=LOCAL_MODEL_PATH
 )
 
-if __name__ == "__main__":
 
-    print("running")
+def analyzeSentiment(text: str) -> dict:
+
+    output = sentimentPipeline(text)[0]
+
+    return {"label": output["label"], "confidence": round((output["score"] * 100), 2)}
+
+
+if __name__ == "__main__":
 
     testInputs = [
         "I keep getting a 500 Internal Server Error every time I click billing.",
@@ -46,6 +25,7 @@ if __name__ == "__main__":
     ]
 
     for input in testInputs:
-        print(pipeline(input))
-
-    tokenize()
+        pred = analyzeSentiment(input)[0]
+        print(f"text: {input}")
+        print(f"Label: {pred['label'].upper()} Confidence: {pred['confidence']}%")
+        print("-" * 50)
