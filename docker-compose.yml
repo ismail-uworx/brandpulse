@@ -1,10 +1,13 @@
-version: "3.9"
+name: brandpulse
 
 services:
 
   backend:
     build: .
     container_name: brandpulse-backend
+
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
 
     ports:
       - "8000:8000"
