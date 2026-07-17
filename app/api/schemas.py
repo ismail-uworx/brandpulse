@@ -17,23 +17,19 @@ from datetime import datetime
 
 
 class AIPacketIn(BaseModel):
-    """
-    The shape you EXPECT to receive once Basim/Ismail's stages are
-    wired in. This is your documented assumption — confirm it with
-    them once they're ready, adjust here if their real output differs.
-    """
+    packet_id: Optional[str] = None
     source: str
     author: str
     raw_text: str
     sentiment: str
     category: str
     confidence: Optional[float] = None
-    original_timestamp: Optional[datetime] = None
-
+    timestamp: Optional[str] = None
 
 class ComplaintOut(BaseModel):
     """What your API sends back out — includes fields YOU added."""
     id: int
+    packet_id: Optional[str] = None
     source: str
     author: str
     raw_text: str
@@ -44,4 +40,4 @@ class ComplaintOut(BaseModel):
     created_at: datetime
 
     class Config:
-        from_attributes = True  # lets Pydantic build this from a SQLAlchemy row directly
+        from_attributes = True

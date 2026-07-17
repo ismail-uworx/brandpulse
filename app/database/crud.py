@@ -10,27 +10,27 @@ lives here so it can be reused or tested independently of the API.
 from sqlalchemy.orm import Session
 from app.database import models
 
-
-def create_complaint(db: Session, *, source: str, author: str, raw_text: str,
-                      sentiment: str, category: str, confidence: float | None,
-                      original_timestamp, priority: str, reason: str) -> models.Complaint:
+def create_complaint(db: Session, *, packet_id: str | None, source: str, author: str,
+                      raw_text: str, sentiment: str, category: str,
+                      confidence: float | None, timestamp: str | None,
+                      priority: str, reason: str) -> models.Complaint:
     """Takes the finished decision (from rules.py) and writes ONE row."""
     db_complaint = models.Complaint(
+        packet_id=packet_id,
         source=source,
         author=author,
         raw_text=raw_text,
-        original_timestamp=original_timestamp,
+        timestamp=timestamp,
         sentiment=sentiment,
         category=category,
         confidence=confidence,
         priority=priority,
         reason=reason,
     )
-    db.add(db_complaint)      # stage the row (not written yet)
-    db.commit()                # actually write it to Postgres
-    db.refresh(db_complaint)   # pull back the auto-generated id + created_at
+    db.add(db_complaint)
+    db.commit()
+    db.refresh(db_complaint)
     return db_complaint
-
 
 def get_complaints(db: Session, priority: str | None = None, limit: int = 100):
     """Read complaints, optionally filtered by priority."""

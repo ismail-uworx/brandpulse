@@ -11,7 +11,7 @@ go hunting through database or API code to update a rule.
 from typing import Tuple
 
 # Categories considered high-stakes regardless of sentiment.
-CRITICAL_CATEGORIES = {"security", "payment", "billing", "outage"}
+CRITICAL_CATEGORIES = {"billing & payments", "security risks"}
 
 # Keywords that escalate priority even if sentiment is ambiguous.
 URGENT_KEYWORDS = {"down", "hacked", "breach", "fraud", "500", "error", "unauthorized"}

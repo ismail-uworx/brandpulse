@@ -16,7 +16,6 @@ from app.routing.rules import assign_priority
 
 router = APIRouter()
 
-
 @router.post("/complaints", response_model=schemas.ComplaintOut)
 def ingest_complaint(packet: schemas.AIPacketIn, db: Session = Depends(get_db)):
     """
@@ -29,20 +28,26 @@ def ingest_complaint(packet: schemas.AIPacketIn, db: Session = Depends(get_db)):
 
     saved = crud.create_complaint(
         db,
+        packet_id=packet.packet_id,
         source=packet.source,
         author=packet.author,
         raw_text=packet.raw_text,
         sentiment=packet.sentiment,
         category=packet.category,
         confidence=packet.confidence,
-        original_timestamp=packet.original_timestamp,
+        timestamp=packet.timestamp,
         priority=priority,
         reason=reason,
     )
     return saved
 
-
 @router.get("/complaints", response_model=list[schemas.ComplaintOut])
 def list_complaints(priority: str | None = None, db: Session = Depends(get_db)):
     """GET /complaints or GET /complaints?priority=Critical"""
     return crud.get_complaints(db, priority=priority)
+
+
+@router.get("/critical", response_model=list[schemas.ComplaintOut])
+def list_critical(db: Session = Depends(get_db)):
+    """Shortcut for GET /complaints?priority=Critical, matching the original spec."""
+    return crud.get_complaints(db, priority="Critical")
